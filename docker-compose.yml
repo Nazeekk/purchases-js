@@ -1,0 +1,45 @@
+version: '3.9'
+services:
+  backend:
+    build: ./backend
+    container_name: backend
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - '3000:3000'
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: qwerty
+      DB_NAME: postgres
+
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    restart: always
+    ports:
+      - '5173:5173'
+    depends_on:
+      - backend
+    environment:
+      VITE_API_URL: http://localhost:3000
+
+  db:
+    image: postgres:16
+    container_name: postgres_db
+    restart: always
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+volumes:
+  pg_data:
